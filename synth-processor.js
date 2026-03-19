@@ -545,11 +545,11 @@ class KR106Processor extends AudioWorkletProcessor {
     this.scopeCounter = 0;
     this.scopeDownsample = Math.floor(this.sr / 256 / 30); // ~30fps
 
-    // Current params (smoothed)
+    // Current params (all 0-1 slider values)
     this.p = {
       dcoLfo: 0, dcoPwm: 0.5, dcoSub: 0.5, dcoNoise: 0,
       sawOn: true, pulseOn: false, subOn: true,
-      vcfFreq: 8000, vcfRes: 0, vcfEnv: 0.3, vcfLfo: 0, vcfKbd: 0.5,
+      vcfFreq: 0.5, vcfRes: 0, vcfEnv: 0.3, vcfLfo: 0, vcfKbd: 0.5,
       vcfEnvInv: false,
       envA: 0.02, envD: 0.3, envS: 0.6, envR: 0.2,
       vcaLevel: 0.8, vcaMode: 0,
@@ -558,7 +558,8 @@ class KR106Processor extends AudioWorkletProcessor {
       lfoRate: 0.3, lfoDelay: 0.3,
       portaRate: 0,
       transpose: 0,
-      masterVol: 0.8
+      masterVol: 0.8,
+      arpEnabled: false, arpMode: 0, arpRange: 0, arpRate: 0.5
     };
 
     // Target params (from UI)
@@ -582,6 +583,8 @@ class KR106Processor extends AudioWorkletProcessor {
       this.target[msg.name] = msg.value;
     } else if (msg.type === 'preset') {
       Object.assign(this.target, msg.params);
+      // Instant apply for presets (no smoothing lag)
+      Object.assign(this.p, msg.params);
     }
   }
 
