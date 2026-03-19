@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ULTRAMASTER KR-106</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0a0a0a;
+  color: #e0e0e0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.accent-bar {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #cc0000 0%, #cc0000 70%, #2233cc 70%, #2233cc 100%);
+}
+
+.synth-container {
+  width: 940px;
+  margin: 20px auto;
+  position: relative;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px 10px;
+}
+
+.logo {
+  font-size: 18px;
+  letter-spacing: 4px;
+  color: #fff;
+}
+
+.logo span { color: #cc0000; }
+
+.preset-display {
+  background: #111;
+  border: 1px solid #333;
+  padding: 6px 16px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #228B22;
+  min-width: 240px;
+  text-align: center;
+}
+
+.panel {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  padding: 12px 16px;
+  position: relative;
+}
+
+.sections {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+}
+
+.section {
+  padding: 0 10px;
+  border-right: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section:last-child { border-right: none; }
+
+.section-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #666;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.controls-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+/* Vertical slider (fader) */
+.fader-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.fader-track {
+  width: 14px;
+  height: 56px;
+  background: #111;
+  border: 1px solid #333;
+  position: relative;
+}
+
+.fader-handle {
+  width: 18px;
+  height: 6px;
+  background: #e0e0e0;
+  position: absolute;
+  left: -3px;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.fader-label {
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #888;
+  white-space: nowrap;
+}
+
+/* LED button */
+.led-btn {
+  width: 28px;
+  height: 28px;
+  background: #111;
+  border: 1px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.led-btn .led {
+  width: 8px;
+  height: 8px;
+  background: #333;
+  border: 1px solid #222;
+}
+
+.led-btn.active .led {
+  background: #cc0000;
+  box-shadow: 0 0 6px #cc0000;
+}
+
+.led-btn-label {
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #888;
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* 3-way switch */
+.switch3 {
+  width: 14px;
+  height: 36px;
+  background: #111;
+  border: 1px solid #444;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.switch3-handle {
+  width: 12px;
+  height: 12px;
+  background: #ccc;
+  position: absolute;
+  left: 0;
+}
+
+.switch3-label {
+  font-size: 6px;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* Scope */
+.scope-container {
+  width: 140px;
+  height: 70px;
+  background: #050505;
+  border: 1px solid #333;
+}
+
+.scope-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Keyboard */
+.keyboard-container {
+  margin-top: 10px;
+  position: relative;
+  height: 100px;
+  width: 100%;
+  display: flex;
+}
+
+.key {
+  position: relative;
+  flex: 1;
+  background: #e8e8e8;
+  border: 1px solid #333;
+  border-top: 2px solid #666;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+
+.key.active, .key:active {
+  background: #228B22;
+  border-color: #1a6e1a;
+}
+
+.key span {
+  font-size: 7px;
+  color: #666;
+  pointer-events: none;
+}
+
+.key.active span { color: #fff; }
+
+.black-keys {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.black-key {
+  position: absolute;
+  width: 3.2%;
+  height: 100%;
+  background: #111;
+  border: 1px solid #333;
+  border-top: 2px solid #444;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.black-key.active, .black-key:active {
+  background: #1a5e1a;
+  border-color: #228B22;
+}
+
+/* Preset browser */
+.preset-nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.preset-btn {
+  background: #222;
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 4px 10px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.preset-btn:active { background: #333; }
+
+/* Start overlay */
+.start-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0a0a0a;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.start-overlay.hidden { display: none; }
+
+.start-title {
+  font-size: 32px;
+  letter-spacing: 8px;
+  color: #fff;
+}
+
+.start-title span { color: #cc0000; }
+
+.start-sub {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #666;
+}
+
+.start-btn {
+  background: none;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 14px 40px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-top: 20px;
+}
+
+.start-btn:active { background: #222; }
+
+/* Bottom bar */
+.bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px 0;
+  width: 100%;
+}
+
+.midi-status {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #444;
+}
+
+.midi-status.connected { color: #228B22; }
+
+.key-hint {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #444;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #333; }
+</style>
+</head>
+<body>
+
+<div class="start-overlay" id="startOverlay">
+  <div class="start-title">ULTRAMASTER <span>KR-106</span></div>
+  <div class="start-sub">VIRTUAL ANALOG SYNTHESIZER</div>
+  <div class="start-sub" style="color:#444; font-size:10px;">6-VOICE POLYPHONIC &bull; TPT LADDER FILTER &bull; BBD CHORUS</div>
+  <button class="start-btn" id="startBtn">START</button>
+  <div class="start-sub" style="color:#333; font-size:9px; margin-top:30px;">PLAY WITH COMPUTER KEYBOARD (A-L) OR MIDI CONTROLLER</div>
+</div>
+
+<div class="accent-bar"></div>
+
+<div class="synth-container">
+  <div class="header-row">
+    <div class="logo">ULTRAMASTER <span>KR-106</span></div>
+    <div class="preset-nav">
+      <button class="preset-btn" id="prevPreset">&lt;</button>
+      <div class="preset-display" id="presetDisplay">A11 BRASS</div>
+      <button class="preset-btn" id="nextPreset">&gt;</button>
+    </div>
+    <div class="scope-container">
+      <canvas class="scope-canvas" id="scopeCanvas" width="280" height="140"></canvas>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="sections" id="controlSections">
+      <!-- LFO -->
+      <div class="section">
+        <div class="section-label">LFO</div>
+        <div class="controls-row">
+          <div class="fader-group">
+            <div class="fader-track" data-param="lfoRate" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">RATE</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="lfoDelay" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">DELAY</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DCO -->
+      <div class="section">
+        <div class="section-label">DCO</div>
+        <div class="controls-row">
+          <div class="fader-group">
+            <div class="fader-track" data-param="dcoLfo" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">LFO</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="dcoPwm" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">PWM</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <div class="led-btn" data-toggle="pulseOn" id="btnPulse">
+              <div class="led"></div>
+            </div>
+            <div class="led-btn-label">PULSE</div>
+            <div class="led-btn active" data-toggle="sawOn" id="btnSaw">
+              <div class="led"></div>
+            </div>
+            <div class="led-btn-label">SAW</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <div class="led-btn active" data-toggle="subOn" id="btnSub">
+              <div class="led"></div>
+            </div>
+            <div class="led-btn-label">SUB</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="dcoSub" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">SUB</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="dcoNoise" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">NOISE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HPF -->
+      <div class="section">
+        <div class="section-label">HPF</div>
+        <div class="controls-row">
+          <div class="fader-group">
+            <div class="fader-track" data-param="hpf" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">FREQ</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VCF -->
+      <div class="section">
+        <div class="section-label">VCF</div>
+        <div class="controls-row">
+          <div class="fader-group">
+            <div class="fader-track" data-param="vcfFreq" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">FREQ</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="vcfRes" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">RES</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="vcfEnv" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">ENV</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="vcfLfo" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">LFO</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="vcfKbd" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">KBD</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VCA -->
+      <div class="section">
+        <div class="section-label">VCA</div>
+        <div class="controls-row">
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <div class="led-btn" data-toggle="vcaMode" data-mode="toggle01" id="btnVcaMode">
+              <div class="led"></div>
+            </div>
+            <div class="led-btn-label">GATE</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="vcaLevel" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">LEVEL</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENV -->
+      <div class="section">
+        <div class="section-label">ENV</div>
+        <div class="controls-row">
+          <div class="fader-group">
+            <div class="fader-track" data-param="envA" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">A</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="envD" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">D</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="envS" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">S</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="envR" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">R</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHORUS -->
+      <div class="section">
+        <div class="section-label">CHORUS</div>
+        <div class="controls-row">
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <div class="led-btn" data-chorus="0" id="btnChorusOff">
+              <div class="led"></div>
+            </div>
+            <div class="led-btn-label">OFF</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <div class="led-btn active" data-chorus="1" id="btnChorusI">
+              <div class="led"></div>
+            </div>
+            <div class="led-btn-label">I</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <div class="led-btn" data-chorus="2" id="btnChorusII">
+              <div class="led"></div>
+            </div>
+            <div class="led-btn-label">II</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASTER -->
+      <div class="section">
+        <div class="section-label">MASTER</div>
+        <div class="controls-row">
+          <div class="fader-group">
+            <div class="fader-track" data-param="masterVol" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">VOL</div>
+          </div>
+          <div class="fader-group">
+            <div class="fader-track" data-param="portaRate" data-min="0" data-max="1">
+              <div class="fader-handle"></div>
+            </div>
+            <div class="fader-label">PORTA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard -->
+  <div class="keyboard-container" id="keyboard"></div>
+
+  <div class="bottom-bar">
+    <div class="midi-status" id="midiStatus">MIDI: NOT CONNECTED</div>
+    <div class="key-hint">KEYS: A-L (NOTES) &bull; Z/X (OCTAVE) &bull; 1-9 (PRESETS)</div>
+  </div>
+</div>
+
+<script>
+// ==================== PRESETS ====================
+const PRESETS = [
+  { name: "A11 BRASS", p: { lfoRate:0.15748, lfoDelay:0.385827, dcoLfo:0, dcoPwm:0.80315, dcoSub:0, dcoNoise:0, hpf:0.333, vcfFreq:0.275591, vcfRes:0.102362, vcfEnv:0.456693, vcfLfo:0, vcfKbd:0.677165, vcaLevel:0.850394, envA:0.023622, envD:0.385827, envS:0.354331, envR:0.251969, pulseOn:false, sawOn:true, subOn:false, chorusMode:1, vcaMode:0 }},
+  { name: "A15 MOVING STRINGS", p: { lfoRate:0.496063, lfoDelay:0, dcoLfo:0, dcoPwm:0.307087, dcoSub:0.110236, dcoNoise:0, hpf:0.333, vcfFreq:0.606299, vcfRes:0.15748, vcfEnv:0.0314961, vcfLfo:0, vcfKbd:0.874016, vcaLevel:0.267717, envA:0.102362, envD:0.685039, envS:0.692913, envR:0.275591, pulseOn:true, sawOn:true, subOn:true, chorusMode:2, vcaMode:0 }},
+  { name: "A17 CHOIR", p: { lfoRate:0.464567, lfoDelay:0.110236, dcoLfo:0.102362, dcoPwm:0.19685, dcoSub:0, dcoNoise:0, hpf:0.667, vcfFreq:0.464567, vcfRes:0.740157, vcfEnv:0.015748, vcfLfo:0, vcfKbd:0.488189, vcaLevel:1, envA:0.535433, envD:0.0866142, envS:1, envR:0.377953, pulseOn:true, sawOn:false, subOn:false, chorusMode:1, vcaMode:0 }},
+  { name: "A18 PIANO I", p: { lfoRate:0.15748, lfoDelay:0.385827, dcoLfo:0, dcoPwm:0.629921, dcoSub:0.677165, dcoNoise:0, hpf:0.333, vcfFreq:0.511811, vcfRes:0.0944882, vcfEnv:0.0787402, vcfLfo:0, vcfKbd:0.212598, vcaLevel:0.811024, envA:0, envD:0.519685, envS:0, envR:0.23622, pulseOn:true, sawOn:false, subOn:true, chorusMode:0, vcaMode:0 }},
+  { name: "A21 ORGAN I", p: { lfoRate:0.425197, lfoDelay:0.11811, dcoLfo:0, dcoPwm:0.417323, dcoSub:0.181102, dcoNoise:0, hpf:0, vcfFreq:0.338583, vcfRes:0.598425, vcfEnv:0.110236, vcfLfo:0.00787402, vcfKbd:1, vcaLevel:0.787402, envA:0, envD:0.0787402, envS:0.645669, envR:0, pulseOn:true, sawOn:false, subOn:true, chorusMode:0, vcaMode:1 }},
+  { name: "A27 ELECT. PIANO I", p: { lfoRate:0.464567, lfoDelay:0, dcoLfo:0, dcoPwm:0, dcoSub:0, dcoNoise:0, hpf:1, vcfFreq:0.125984, vcfRes:0.244094, vcfEnv:0.480315, vcfLfo:0.0472441, vcfKbd:0.275591, vcaLevel:1, envA:0.00787402, envD:0.669291, envS:0.338583, envR:0.314961, pulseOn:true, sawOn:false, subOn:false, chorusMode:2, vcaMode:0 }},
+  { name: "A44 GUITAR", p: { lfoRate:0.677165, lfoDelay:0.456693, dcoLfo:0, dcoPwm:0.511811, dcoSub:0, dcoNoise:0, hpf:0.333, vcfFreq:0.0944882, vcfRes:0.11811, vcfEnv:0.559055, vcfLfo:0, vcfKbd:0.23622, vcaLevel:0.755906, envA:0, envD:0.409449, envS:0.425197, envR:0.244094, pulseOn:true, sawOn:true, subOn:false, chorusMode:2, vcaMode:0 }},
+  { name: "A48 SYNTH BASS I", p: { lfoRate:0.456693, lfoDelay:0.125984, dcoLfo:0.00787402, dcoPwm:0.448819, dcoSub:0.80315, dcoNoise:0.393701, hpf:0, vcfFreq:0.251969, vcfRes:0, vcfEnv:0.519685, vcfLfo:0, vcfKbd:0.275591, vcaLevel:0.590551, envA:0, envD:0.267717, envS:0, envR:0.283465, pulseOn:true, sawOn:false, subOn:true, chorusMode:2, vcaMode:0 }},
+  { name: "A51 LEAD I", p: { lfoRate:0.566929, lfoDelay:0.692913, dcoLfo:0.141732, dcoPwm:0, dcoSub:0, dcoNoise:0, hpf:0, vcfFreq:0.314961, vcfRes:0.76378, vcfEnv:0.283465, vcfLfo:0, vcfKbd:0.409449, vcaLevel:0.779528, envA:0, envD:0.354331, envS:0.574803, envR:0, pulseOn:true, sawOn:false, subOn:false, chorusMode:1, vcaMode:1 }},
+  { name: "A55 SYNTH BASS II", p: { lfoRate:0.708661, lfoDelay:0.165354, dcoLfo:0, dcoPwm:0, dcoSub:0.354331, dcoNoise:0, hpf:0, vcfFreq:0.338583, vcfRes:0, vcfEnv:0.370079, vcfLfo:0, vcfKbd:0, vcaLevel:0.614173, envA:0, envD:0.291339, envS:0.0708661, envR:0.173228, pulseOn:false, sawOn:true, subOn:true, chorusMode:2, vcaMode:1 }},
+  { name: "A68 SYNTH PAD", p: { lfoRate:0.440945, lfoDelay:0, dcoLfo:0.0393701, dcoPwm:0.338583, dcoSub:0.291339, dcoNoise:0, hpf:0, vcfFreq:0.291339, vcfRes:0, vcfEnv:0.661417, vcfLfo:0, vcfKbd:1, vcaLevel:0.401575, envA:0, envD:0.669291, envS:0.590551, envR:0.488189, pulseOn:true, sawOn:false, subOn:true, chorusMode:2, vcaMode:0 }},
+  { name: "A71 SWEEP I", p: { lfoRate:0.614173, lfoDelay:0, dcoLfo:0, dcoPwm:0.80315, dcoSub:0.330709, dcoNoise:0.220472, hpf:0.333, vcfFreq:0.905512, vcfRes:0.314961, vcfEnv:0.527559, vcfLfo:0, vcfKbd:0, vcaLevel:0.76378, envA:0, envD:0.496063, envS:1, envR:0.645669, pulseOn:true, sawOn:false, subOn:true, chorusMode:2, vcaMode:0 }},
+  { name: "A82 RESONANCE FUNK", p: { lfoRate:0.464567, lfoDelay:0, dcoLfo:0, dcoPwm:0, dcoSub:0, dcoNoise:0, hpf:0.333, vcfFreq:0.204724, vcfRes:1, vcfEnv:0.354331, vcfLfo:0, vcfKbd:0.700787, vcaLevel:1, envA:0, envD:0.149606, envS:0, envR:0.173228, pulseOn:false, sawOn:false, subOn:false, chorusMode:0, vcaMode:0 }},
+  { name: "B11 STRINGS", p: { lfoRate:0.448819, lfoDelay:0.354331, dcoLfo:0, dcoPwm:0.433071, dcoSub:0, dcoNoise:0, hpf:0, vcfFreq:0.669291, vcfRes:0, vcfEnv:0, vcfLfo:0, vcfKbd:0.850394, vcaLevel:0.409449, envA:0.464567, envD:0.251969, envS:0.677165, envR:0.314961, pulseOn:true, sawOn:true, subOn:false, chorusMode:2, vcaMode:0 }},
+  { name: "B35 TOMITA", p: { lfoRate:0.614173, lfoDelay:0, dcoLfo:0, dcoPwm:0.826772, dcoSub:0, dcoNoise:0, hpf:0, vcfFreq:0.385827, vcfRes:0.984252, vcfEnv:0.11811, vcfLfo:0.015748, vcfKbd:1, vcaLevel:0.448819, envA:0, envD:0.110236, envS:0.622047, envR:0, pulseOn:false, sawOn:false, subOn:false, chorusMode:0, vcaMode:1 }},
+  { name: "B56 ETHEREAL", p: { lfoRate:0.543307, lfoDelay:0, dcoLfo:0, dcoPwm:0.826772, dcoSub:0.464567, dcoNoise:0, hpf:0, vcfFreq:0.370079, vcfRes:0.944882, vcfEnv:0, vcfLfo:0, vcfKbd:1, vcaLevel:0.472441, envA:0.724409, envD:0.393701, envS:1, envR:0.433071, pulseOn:true, sawOn:true, subOn:false, chorusMode:2, vcaMode:0 }},
+];
+
+// ==================== APP STATE ====================
+let audioCtx, synthNode;
+let currentPresetIdx = 0;
+let currentOctave = 4; // C4 = MIDI 60
+let activeKeys = new Set();
+let midiAccess = null;
+
+// ==================== AUDIO INIT ====================
+async function initAudio() {
+  audioCtx = new AudioContext({ sampleRate: 44100 });
+  await audioCtx.audioWorklet.addModule('synth-processor.js');
+  synthNode = new AudioWorkletNode(audioCtx, 'kr106-processor', {
+    numberOfOutputs: 1,
+    outputChannelCount: [2]
+  });
+  synthNode.connect(audioCtx.destination);
+
+  synthNode.port.onmessage = (e) => {
+    if (e.data.type === 'scope') drawScope(e.data.data);
+  };
+
+  // Load first preset
+  loadPreset(0);
+
+  // Init MIDI
+  initMIDI();
+}
+
+// ==================== PRESETS ====================
+function loadPreset(idx) {
+  currentPresetIdx = idx;
+  const preset = PRESETS[idx];
+  document.getElementById('presetDisplay').textContent = preset.name;
+  synthNode.port.postMessage({ type: 'preset', params: preset.p });
+  updateFadersFromPreset(preset.p);
+  updateButtonsFromPreset(preset.p);
+}
+
+function updateFadersFromPreset(p) {
+  document.querySelectorAll('.fader-track').forEach(track => {
+    const param = track.dataset.param;
+    if (p[param] !== undefined) {
+      const val = p[param];
+      const handle = track.querySelector('.fader-handle');
+      const h = track.offsetHeight - 6;
+      handle.style.bottom = (val * h) + 'px';
+      track._value = val;
+    }
+  });
+}
+
+function updateButtonsFromPreset(p) {
+  document.getElementById('btnSaw').classList.toggle('active', !!p.sawOn);
+  document.getElementById('btnPulse').classList.toggle('active', !!p.pulseOn);
+  document.getElementById('btnSub').classList.toggle('active', !!p.subOn);
+  document.getElementById('btnVcaMode').classList.toggle('active', p.vcaMode === 1);
+
+  const cm = p.chorusMode || 0;
+  document.getElementById('btnChorusOff').classList.toggle('active', cm === 0);
+  document.getElementById('btnChorusI').classList.toggle('active', cm === 1);
+  document.getElementById('btnChorusII').classList.toggle('active', cm === 2);
+}
+
+// ==================== FADER INTERACTION ====================
+function initFaders() {
+  let dragTarget = null;
+
+  const updateFader = (track, clientY) => {
+    const rect = track.getBoundingClientRect();
+    const h = rect.height - 6;
+    let val = 1 - (clientY - rect.top - 3) / h;
+    val = Math.max(0, Math.min(1, val));
+    track.querySelector('.fader-handle').style.bottom = (val * h) + 'px';
+    track._value = val;
+    const param = track.dataset.param;
+    if (synthNode) {
+      synthNode.port.postMessage({ type: 'param', name: param, value: val });
+    }
+  };
+
+  document.querySelectorAll('.fader-track').forEach(track => {
+    track._value = 0;
+    track.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      dragTarget = track;
+      track.setPointerCapture(e.pointerId);
+      updateFader(track, e.clientY);
+    });
+    track.addEventListener('pointermove', (e) => {
+      if (dragTarget === track) updateFader(track, e.clientY);
+    });
+    track.addEventListener('pointerup', () => { dragTarget = null; });
+    track.addEventListener('pointercancel', () => { dragTarget = null; });
+  });
+}
+
+// ==================== BUTTONS ====================
+function initButtons() {
+  // Waveform toggles
+  ['btnSaw', 'btnPulse', 'btnSub'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => {
+      const btn = document.getElementById(id);
+      btn.classList.toggle('active');
+      const param = btn.dataset.toggle;
+      const val = btn.classList.contains('active');
+      if (synthNode) synthNode.port.postMessage({ type: 'param', name: param, value: val });
+    });
+  });
+
+  // VCA mode
+  document.getElementById('btnVcaMode').addEventListener('click', () => {
+    const btn = document.getElementById('btnVcaMode');
+    btn.classList.toggle('active');
+    const val = btn.classList.contains('active') ? 1 : 0;
+    if (synthNode) synthNode.port.postMessage({ type: 'param', name: 'vcaMode', value: val });
+  });
+
+  // Chorus buttons
+  ['btnChorusOff', 'btnChorusI', 'btnChorusII'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => {
+      const mode = parseInt(document.getElementById(id).dataset.chorus);
+      document.getElementById('btnChorusOff').classList.toggle('active', mode === 0);
+      document.getElementById('btnChorusI').classList.toggle('active', mode === 1);
+      document.getElementById('btnChorusII').classList.toggle('active', mode === 2);
+      if (synthNode) synthNode.port.postMessage({ type: 'param', name: 'chorusMode', value: mode });
+    });
+  });
+
+  // Preset nav
+  document.getElementById('prevPreset').addEventListener('click', () => {
+    loadPreset((currentPresetIdx - 1 + PRESETS.length) % PRESETS.length);
+  });
+  document.getElementById('nextPreset').addEventListener('click', () => {
+    loadPreset((currentPresetIdx + 1) % PRESETS.length);
+  });
+}
+
+// ==================== KEYBOARD ====================
+function buildKeyboard() {
+  const container = document.getElementById('keyboard');
+  // 3 octaves of white keys
+  const whiteNotes = [0,2,4,5,7,9,11]; // C D E F G A B
+  const blackNoteMap = {0:1, 2:3, 4:null, 5:6, 7:8, 9:10, 11:null};
+  const numOctaves = 3;
+  const whiteKeys = [];
+
+  let html = '';
+  for (let oct = 0; oct < numOctaves; oct++) {
+    for (let i = 0; i < 7; i++) {
+      const noteInOct = whiteNotes[i];
+      const midiNote = (currentOctave + oct) * 12 + noteInOct;
+      html += `<div class="key" data-note="${midiNote}"><span>${noteNames(midiNote)}</span></div>`;
+    }
+  }
+  container.innerHTML = html;
+
+  // Black keys overlay
+  const blackDiv = document.createElement('div');
+  blackDiv.className = 'black-keys';
+  const totalWhite = numOctaves * 7;
+  const ww = 100 / totalWhite; // percent per white key
+
+  for (let oct = 0; oct < numOctaves; oct++) {
+    for (let i = 0; i < 7; i++) {
+      const bn = blackNoteMap[whiteNotes[i]];
+      if (bn !== null && bn !== undefined) {
+        const midiNote = (currentOctave + oct) * 12 + bn;
+        const pos = (oct * 7 + i + 1) * ww - ww * 0.32;
+        const bk = document.createElement('div');
+        bk.className = 'black-key';
+        bk.dataset.note = midiNote;
+        bk.style.left = pos + '%';
+        blackDiv.appendChild(bk);
+      }
+    }
+  }
+  container.appendChild(blackDiv);
+
+  // Mouse interaction
+  const noteOn = (el) => {
+    const note = parseInt(el.dataset.note);
+    el.classList.add('active');
+    if (synthNode) synthNode.port.postMessage({ type: 'noteOn', note, velocity: 100 });
+  };
+  const noteOff = (el) => {
+    const note = parseInt(el.dataset.note);
+    el.classList.remove('active');
+    if (synthNode) synthNode.port.postMessage({ type: 'noteOff', note });
+  };
+
+  container.querySelectorAll('.key, .black-key').forEach(el => {
+    el.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      noteOn(el);
+    });
+    el.addEventListener('pointerup', () => noteOff(el));
+    el.addEventListener('pointerleave', () => {
+      if (el.classList.contains('active')) noteOff(el);
+    });
+  });
+}
+
+function noteNames(midi) {
+  const names = ['C','C','D','D','E','F','F','G','G','A','A','B'];
+  return names[midi % 12] + Math.floor(midi / 12 - 1);
+}
+
+// ==================== COMPUTER KEYBOARD ====================
+const keyMap = {
+  'a': 0, 'w': 1, 's': 2, 'e': 3, 'd': 4, 'f': 5,
+  't': 6, 'g': 7, 'y': 8, 'h': 9, 'u': 10, 'j': 11,
+  'k': 12, 'o': 13, 'l': 14, 'p': 15
+};
+
+function initComputerKeyboard() {
+  document.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    const k = e.key.toLowerCase();
+
+    if (k === 'z') { currentOctave = Math.max(1, currentOctave - 1); buildKeyboard(); return; }
+    if (k === 'x') { currentOctave = Math.min(7, currentOctave + 1); buildKeyboard(); return; }
+
+    // Number keys for presets
+    if (k >= '1' && k <= '9') {
+      const idx = parseInt(k) - 1;
+      if (idx < PRESETS.length) loadPreset(idx);
+      return;
+    }
+    if (k === '0' && PRESETS.length > 9) { loadPreset(9); return; }
+
+    if (keyMap[k] !== undefined && !activeKeys.has(k)) {
+      activeKeys.add(k);
+      const note = currentOctave * 12 + keyMap[k];
+      if (synthNode) synthNode.port.postMessage({ type: 'noteOn', note, velocity: 100 });
+      highlightKey(note, true);
+    }
+  });
+
+  document.addEventListener('keyup', (e) => {
+    const k = e.key.toLowerCase();
+    if (keyMap[k] !== undefined) {
+      activeKeys.delete(k);
+      const note = currentOctave * 12 + keyMap[k];
+      if (synthNode) synthNode.port.postMessage({ type: 'noteOff', note });
+      highlightKey(note, false);
+    }
+  });
+}
+
+function highlightKey(note, on) {
+  const el = document.querySelector(`.key[data-note="${note}"], .black-key[data-note="${note}"]`);
+  if (el) el.classList.toggle('active', on);
+}
+
+// ==================== WEB MIDI ====================
+async function initMIDI() {
+  try {
+    midiAccess = await navigator.requestMIDIAccess();
+    const statusEl = document.getElementById('midiStatus');
+
+    const connectInputs = () => {
+      let connected = false;
+      midiAccess.inputs.forEach(input => {
+        input.onmidimessage = handleMIDI;
+        connected = true;
+      });
+      statusEl.textContent = connected ? 'MIDI: CONNECTED' : 'MIDI: NO DEVICES';
+      statusEl.classList.toggle('connected', connected);
+    };
+
+    connectInputs();
+    midiAccess.onstatechange = connectInputs;
+  } catch (e) {
+    // MIDI not available
+  }
+}
+
+function handleMIDI(msg) {
+  const [status, note, vel] = msg.data;
+  const cmd = status & 0xF0;
+  if (cmd === 0x90 && vel > 0) {
+    synthNode.port.postMessage({ type: 'noteOn', note, velocity: vel });
+    highlightKey(note, true);
+  } else if (cmd === 0x80 || (cmd === 0x90 && vel === 0)) {
+    synthNode.port.postMessage({ type: 'noteOff', note });
+    highlightKey(note, false);
+  } else if (cmd === 0xB0) {
+    // CC: map mod wheel to VCF freq
+    if (note === 1) {
+      synthNode.port.postMessage({ type: 'param', name: 'vcfFreq', value: vel / 127 });
+    }
+  }
+}
+
+// ==================== SCOPE ====================
+const scopeCanvas = document.getElementById('scopeCanvas');
+const scopeCtx = scopeCanvas.getContext('2d');
+
+function drawScope(data) {
+  const w = scopeCanvas.width;
+  const h = scopeCanvas.height;
+  scopeCtx.fillStyle = '#050505';
+  scopeCtx.fillRect(0, 0, w, h);
+
+  // Grid
+  scopeCtx.strokeStyle = '#1a1a1a';
+  scopeCtx.lineWidth = 0.5;
+  for (let y = 0; y < h; y += h / 4) {
+    scopeCtx.beginPath();
+    scopeCtx.moveTo(0, y);
+    scopeCtx.lineTo(w, y);
+    scopeCtx.stroke();
+  }
+
+  // Waveform
+  scopeCtx.strokeStyle = '#228B22';
+  scopeCtx.lineWidth = 1.5;
+  scopeCtx.beginPath();
+  const step = w / data.length;
+  for (let i = 0; i < data.length; i++) {
+    const x = i * step;
+    const y = h / 2 - data[i] * h * 2;
+    if (i === 0) scopeCtx.moveTo(x, y);
+    else scopeCtx.lineTo(x, y);
+  }
+  scopeCtx.stroke();
+}
+
+// ==================== INIT ====================
+document.getElementById('startBtn').addEventListener('click', async () => {
+  document.getElementById('startOverlay').classList.add('hidden');
+  await initAudio();
+  initFaders();
+  initButtons();
+  buildKeyboard();
+  initComputerKeyboard();
+});
+
+// Draw empty scope
+drawScope(new Array(256).fill(0));
+</script>
+</body>
+</html>
